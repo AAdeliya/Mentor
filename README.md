@@ -16,6 +16,7 @@ Tools & Dependencies Used
     - `spring-boot-starter-thymeleaf`
     - `spring-boot-starter-data-jpa`
     - `spring-boot-starter-test` (JUnit 5)
+    - `spring-security-crypto`
 - **Database**: `com.h2database:h2` (runtime)
 - **Lombok**: `org.projectlombok:lombok`
 - **Build**: **Maven** + `spring-boot-maven-plugin`
@@ -36,4 +37,6 @@ cd Mentor
 ./mvnw spring-boot:run
 
 App defaults to `http://localhost:8080`.
+
+//h2-console
 
