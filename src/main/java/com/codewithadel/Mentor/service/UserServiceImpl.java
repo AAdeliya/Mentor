@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Users registerUser(UserRegistrationDto userData) {
         if (usersRepo.existsByUsername(userData.username())) {
-            throw  new IllegalArgumentException("Username already exists");
+            throw new IllegalArgumentException("Username already exists");
         }
 
         String hashedPassword = passwordEncoder.encode(userData.password());
@@ -34,5 +34,12 @@ public class UserServiceImpl implements UserService {
         return Optional.ofNullable(usersRepo.findByUsername(username));
     }
 
-
+    @Override
+    public Users authenticate(String username, String rawPassword) {
+        Users user = usersRepo.findByUsername(username);
+        if (user == null || !passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+        return user;
+    }
 }

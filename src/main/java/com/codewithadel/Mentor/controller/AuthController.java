@@ -4,6 +4,7 @@ import com.codewithadel.Mentor.dto.LoginRequestDto;
 import com.codewithadel.Mentor.dto.UserRegistrationDto;
 import com.codewithadel.Mentor.dto.UserResponseDto;
 import com.codewithadel.Mentor.model.Users;
+import com.codewithadel.Mentor.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final UserService userService;
+
     public AuthController(UserService userService) {
         this.userService = userService;
     }
@@ -34,15 +36,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<UserResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
         try {
-        Users user = userService.authenticate(loginRequestDto.username(), loginRequestDto.password());
-        return ResponseEntity.ok(UserResponseDto.fromEntity(user));
+            Users user = userService.authenticate(loginRequestDto.username(), loginRequestDto.password());
+            return ResponseEntity.ok(UserResponseDto.fromEntity(user));
 
         } catch(IllegalArgumentException ex) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
-
+            Users user = userService.authenticate(loginRequestDto.username(), loginRequestDto.password());
+            return ResponseEntity.ok(UserResponseDto.fromEntity(user));
         }
     }
 }
-
-
-

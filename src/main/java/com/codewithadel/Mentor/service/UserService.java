@@ -1,36 +1,11 @@
 package com.codewithadel.Mentor.service;
-
 import com.codewithadel.Mentor.dto.UserRegistrationDto;
 import com.codewithadel.Mentor.model.Users;
-import com.codewithadel.Mentor.repository.UsersRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 import java.util.Optional;
-@Service
-public class UserService {
 
+public interface UserService {
+ Users registerUser(UserRegistrationDto userData);
+Optional<Users> findByUsername(String username);
 
-    @Autowired
-    private UsersRepo repo;
-
-    public interface UserService {
-
-        private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-
-        public Users register(Users user) {
-            if (repo.existsByUsername(user.getUsername())) {
-                throw new IllegalArgumentException("Username already exists");
-            }
-            user.setPasswordHash(encoder.encode(user.getPasswordHash()));
-            return repo.save(user);
-            Users registerUser (UserRegistrationDto userData);
-
-            Optional<Users> findByUsername (String username);
-
-        }
-
-        Users authenticate(String username, String rawPassword);
-    }
+Users authenticate(String username, String rawPassword);
 }
