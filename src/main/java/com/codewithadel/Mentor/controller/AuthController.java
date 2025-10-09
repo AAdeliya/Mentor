@@ -38,10 +38,8 @@ public class AuthController {
         try {
             Users user = userService.authenticate(loginRequestDto.username(), loginRequestDto.password());
             return ResponseEntity.ok(UserResponseDto.fromEntity(user));
-
-        } catch(IllegalArgumentException ex) {
-            Users user = userService.authenticate(loginRequestDto.username(), loginRequestDto.password());
-            return ResponseEntity.ok(UserResponseDto.fromEntity(user));
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         }
     }
 }
