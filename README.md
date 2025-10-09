@@ -40,3 +40,44 @@ App defaults to `http://localhost:8080`.
 
 //h2-console
 
+
+
+## Testing the Auth API with Postman
+
+1. **Start the application**
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+The REST endpoints are available under `http://localhost:8080/api/auth`. The in-memory
+H2 console remains accessible at `http://localhost:8080/h2-console` while the app is
+running.
+
+2. **Register a user**
+  - Open Postman and create a new `POST` request to `http://localhost:8080/api/auth/register`.
+  - Set the request body to **raw JSON** and supply credentials, for example:
+    ```json
+    {
+      "username": "mentorUser",
+      "password": "StrongPass123"
+    }
+    ```
+  - A successful response returns HTTP `201 Created` with the persisted user's id and
+    username. Registration is handled by `AuthController.register`, which delegates to the
+    `UserService` so the password is hashed before storage.【F:src/main/java/com/codewithadel/Mentor/controller/AuthController.java†L25-L40】【F:src/main/java/com/codewithadel/Mentor/service/UserServiceImpl.java†L21-L55】
+
+3. **Verify the user in H2**
+  - Visit `http://localhost:8080/h2-console` in a browser while the app is running.
+  - Use the default JDBC URL `jdbc:h2:mem:testdb`, username `sa`, and a blank password, then
+    click *Connect*.
+  - Run the query `SELECT id, username, password_hash FROM users;` to confirm the new row.
+
+4. **Test login**
+  - Create another `POST` request in Postman to `http://localhost:8080/api/auth/login` with
+    the same JSON body used during registration.
+  - A `200 OK` response indicates that the supplied password matches the stored BCrypt hash.
+    When credentials do not match, the controller returns HTTP `401 Unauthorized`.
+
+These manual checks give quick feedback that the authentication flow is wired correctly before
+introducing full automated tests or front-end integration.
+
+//h2-console
