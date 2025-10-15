@@ -94,3 +94,19 @@ Mentor/.github/workflows/ci.yml
 
 If the `.github` directory does not exist in your local checkout, create it (and the nested
 `workflows` folder) alongside `pom.xml` before adding the workflow file.
+
+
+
+### Verifying the pipeline
+
+1. **Check in the repository**
+    - Confirm that `.github/workflows/ci.yml` exists and is committed.
+    - Inspect the workflow to make sure it uses the expected Java version and Maven command (`mvn -B -ntp clean verify`).
+2. **Run the workflow steps locally**
+    - Execute `./mvnw -B -ntp clean verify` to ensure the Maven build passes before pushing changes.
+    - Fix any compilation errors, test failures, or formatting issues that appear locally.
+3. **Push to GitHub**
+    - Push a branch or open a pull request against `main` and verify that the workflow triggers automatically.
+    - Review the GitHub Actions run to confirm the `Set up JDK` and `Build with Maven` steps complete successfully.
+4. **Monitor branch protection (optional)**
+    - If branch protection rules are enabled, make sure the `CI` workflow is listed as a required check before merging.
