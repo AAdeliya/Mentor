@@ -81,3 +81,16 @@ These manual checks give quick feedback that the authentication flow is wired co
 introducing full automated tests or front-end integration.
 
 //h2-console
+
+
+## Continuous Integration Workflow
+
+GitHub Actions looks for workflow definitions in the repository root under `.github/workflows/`.
+To enable the CI pipeline defined in this project, ensure the `ci.yml` file is located at:
+
+```
+Mentor/.github/workflows/ci.yml
+```
+
+If the `.github` directory does not exist in your local checkout, create it (and the nested
+`workflows` folder) alongside `pom.xml` before adding the workflow file.
