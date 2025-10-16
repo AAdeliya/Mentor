@@ -5,6 +5,7 @@ import com.codewithadel.Mentor.dto.UserRegistrationDto;
 import com.codewithadel.Mentor.dto.UserResponseDto;
 import com.codewithadel.Mentor.model.Users;
 import com.codewithadel.Mentor.service.UserService;
+import com.codewithadel.Mentor.exception.InvalidRegistrationDataException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,9 +25,19 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponseDto> register(@RequestBody UserRegistrationDto registrationDto) {
+        if (registrationDto == null
+                || registrationDto.username() == null
+                || registrationDto.username().isBlank()
+                || registrationDto.password() == null
+                || registrationDto.password().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username and password must not be empty");
+        }
+
         try {
             Users savedUser = userService.registerUser(registrationDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(UserResponseDto.fromEntity(savedUser));
+        } catch (InvalidRegistrationDataException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
 
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());

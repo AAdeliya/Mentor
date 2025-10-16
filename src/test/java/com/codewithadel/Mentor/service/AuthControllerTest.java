@@ -12,6 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verifyNoInteractions;
+import org.junit.jupiter.api.BeforeEach;
+
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -28,6 +32,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
+    @BeforeEach
+    void resetMocks() {
+        reset(userService, passwordEncoder);
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -69,6 +77,31 @@ class AuthControllerTest {
                             .content(objectMapper.writeValueAsString(new UserRegistrationDto("existing", "pass"))))
                     .andExpect(status().isConflict())
                     .andExpect(status().reason("Username already exists"));
+        }
+
+
+        @Test
+        @DisplayName("returns 400 BAD REQUEST when username is blank")
+        void registerBlankUsername() throws Exception {
+            mockMvc.perform(post("/api/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(new UserRegistrationDto("", "pass"))))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(status().reason("Username and password must not be empty"));
+
+            verifyNoInteractions(userService);
+        }
+
+        @Test
+        @DisplayName("returns 400 BAD REQUEST when password is blank")
+        void registerBlankPassword() throws Exception {
+            mockMvc.perform(post("/api/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(new UserRegistrationDto("newUser", ""))))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(status().reason("Username and password must not be empty"));
+
+            verifyNoInteractions(userService);
         }
     }
 

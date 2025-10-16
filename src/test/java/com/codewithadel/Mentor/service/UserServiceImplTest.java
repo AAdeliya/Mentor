@@ -2,6 +2,8 @@ package com.codewithadel.Mentor.service;
 
 
 import com.codewithadel.Mentor.dto.UserRegistrationDto;
+import com.codewithadel.Mentor.exception.InvalidRegistrationDataException;
+
 import com.codewithadel.Mentor.model.Users;
 import com.codewithadel.Mentor.repository.UsersRepo;
 import org.junit.jupiter.api.DisplayName;
@@ -68,6 +70,28 @@ class UserServiceImplTest {
 
             assertThat(exception.getMessage()).isEqualTo("Username already exists");
             verify(usersRepo, never()).save(any());
+            verify(passwordEncoder, never()).encode(any());
+        }
+
+        @Test
+        @DisplayName("throws InvalidRegistrationDataException when username or password is blank")
+        void registerUserBlankFields() {
+            InvalidRegistrationDataException exception = assertThrows(InvalidRegistrationDataException.class,
+                    () -> userService.registerUser(new UserRegistrationDto("", "password")));
+
+            assertThat(exception.getMessage()).isEqualTo("Username and password must not be empty");
+            verify(usersRepo, never()).existsByUsername(any());
+            verify(passwordEncoder, never()).encode(any());
+        }
+
+        @Test
+        @DisplayName("throws InvalidRegistrationDataException when registration payload is null")
+        void registerUserNullPayload() {
+            InvalidRegistrationDataException exception = assertThrows(InvalidRegistrationDataException.class,
+                    () -> userService.registerUser(null));
+
+            assertThat(exception.getMessage()).isEqualTo("Username and password must not be empty");
+            verify(usersRepo, never()).existsByUsername(any());
             verify(passwordEncoder, never()).encode(any());
         }
     }

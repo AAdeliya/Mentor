@@ -1,6 +1,8 @@
 package com.codewithadel.Mentor.service;
 
 import com.codewithadel.Mentor.dto.UserRegistrationDto;
+import com.codewithadel.Mentor.exception.InvalidRegistrationDataException;
+
 import com.codewithadel.Mentor.model.Users;
 import com.codewithadel.Mentor.repository.UsersRepo;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +22,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Users registerUser(UserRegistrationDto userData) {
+        if (userData == null
+                || userData.username() == null
+                || userData.username().isBlank()
+                || userData.password() == null
+                || userData.password().isBlank()) {
+            throw new InvalidRegistrationDataException("Username and password must not be empty");
+        }
+
         if (usersRepo.existsByUsername(userData.username())) {
             throw new IllegalArgumentException("Username already exists");
         }

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create your Mentor account</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            background: linear-gradient(150deg, #eff6ff, #f8fafc);
+            color: #0f172a;
+        }
+
+        header, footer {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(6px);
+        }
+
+        .container {
+            width: min(960px, 90%);
+            margin: 0 auto;
+            padding: 1.25rem 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 1.5rem;
+        }
+
+        nav a:hover,
+        nav a:focus {
+            text-decoration: underline;
+        }
+
+        main {
+            display: grid;
+            place-items: center;
+            padding: 3rem 1rem;
+        }
+
+        .card {
+            width: min(420px, 100%);
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 18px;
+            padding: 2.25rem;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .card h1 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: clamp(1.75rem, 3vw, 2.25rem);
+            text-align: center;
+        }
+
+        .field {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.75rem 0.9rem;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            font-size: 1rem;
+            transition: border-color 120ms ease, box-shadow 120ms ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.85rem 1.2rem;
+            border-radius: 12px;
+            border: none;
+            background: #2563eb;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 120ms ease, box-shadow 120ms ease;
+        }
+
+        button:hover,
+        button:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(37, 99, 235, 0.25);
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            display: none;
+            font-weight: 600;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.success {
+            background: rgba(16, 185, 129, 0.18);
+            color: #047857;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+
+        .feedback.error {
+            background: rgba(248, 113, 113, 0.18);
+            color: #b91c1c;
+            border: 1px solid rgba(248, 113, 113, 0.35);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container">
+        <nav>
+            <span class="logo" aria-label="Mentor Platform">Mentor</span>
+            <div>
+                <a th:href="@{/}">Home</a>
+                <a th:href="@{/register}">Register</a>
+            </div>
+        </nav>
+    </div>
+</header>
+<main>
+    <div class="card">
+        <h1>Create your account</h1>
+        <form id="registrationForm" th:object="${registrationForm}" novalidate>
+            <div class="field">
+                <label for="username">Username</label>
+                <input id="username" type="text" th:field="*{username}" autocomplete="username" required minlength="3">
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input id="password" type="password" th:field="*{password}" autocomplete="new-password" required minlength="6">
+            </div>
+            <button type="submit">Register</button>
+            <div id="feedback" class="feedback" role="alert" aria-live="polite"></div>
+        </form>
+    </div>
+</main>
+<footer>
+    Already have an account? <a href="/" style="color:#2563eb; font-weight:600; text-decoration:none;">Return home</a>
+</footer>
+<script>
+    const form = document.getElementById('registrationForm');
+    const feedback = document.getElementById('feedback');
+
+    function showFeedback(message, type) {
+        feedback.textContent = message;
+        feedback.className = `feedback show ${type}`;
+    }
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const payload = {
+            username: form.username.value.trim(),
+            password: form.password.value
+        };
+
+        if (!payload.username || !payload.password) {
+            showFeedback('Please provide both a username and a password.', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                showFeedback(`Welcome, ${data.username}! Your account has been created.`, 'success');
+                form.reset();
+            } else {
+                const contentType = response.headers.get('Content-Type');
+                let errorMessage = response.statusText || 'Registration failed.';
+
+                if (contentType && contentType.includes('application/json')) {
+                    const errorBody = await response.json();
+                    errorMessage = errorBody.message || errorMessage;
+                } else {
+                    const text = await response.text();
+                    if (text) {
+                        errorMessage = text;
+                    }
+                }
+                showFeedback(errorMessage, 'error');
+            }
+        } catch (error) {
+            showFeedback('Network error: unable to reach the server.', 'error');
+        }
+    });
+</script>
+</body>
+</html>
